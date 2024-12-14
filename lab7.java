@@ -1,222 +1,201 @@
+// Amazon is building a menu-driven application to manage customer data and process orders
+// efficiently. As part of this system, developers are required to implement the following key
+// components in Java:
+// Classes to Implement
+// 1. Customer Class:
+// ○ Manage customer details, including registration and updates.
+// 2. Product Class:
+// ○ Represent products, with methods to add and update product details in the catalog.
+// 3. Order Class:
+// ○ Facilitate order placement, modification, and retrieval of order history.
+
+// Data Structures to Use
+// 1. ArrayList:
+// ○ Store dynamic lists of customers, products, and orders. This structure should
+// support adding and removing elements flexibly.
+
+// 2. HashMap:
+// ○ Implement fast retrieval for customers and products using unique IDs.
+// 3. HashSet:
+// ○ Ensure only unique products are associated with each customer, avoiding
+// duplicates.
+// 4. TreeSet:
+// ○ Implement sorting for customers or products.
+
+// Task: Use the Comparator Interface
+// Developers must use the Comparator interface to enable custom sorting in the TreeSet. For
+// example:
+// ● Sort products by price, name, or other attributes as required.
+
+// ● Sort orders by delivery date or customers by loyalty points.
+// Implementation Requirements
+// ● Define the necessary classes (Customer, Product, and Order) with relevant attributes and
+// methods.
+// ● Use appropriate data structures (ArrayList, HashMap, HashSet, TreeSet) for efficient data
+// management.
+// ● Implement custom sorting logic by creating classes that implement the Comparator
+// interface.
+// ● Demonstrate the use of TreeSet with the custom sorting logic applied.
+
 import java.util.*;
 
-class ProductPriceComparator implements Comparator<Product> {
+class sortProductPrice implements Comparator<Product> {
+    @Override
     public int compare(Product p1, Product p2) {
-        return Double.compare(p1.getPrice(), p2.getPrice());
-    }
+        return p1.getPrice() - p2.getPrice();
+    }   
 }
 
-class CustomerLoyaltyComparator implements Comparator<Customer> {
+class sortCustomerPoints implements Comparator<Customer> {
+    @Override
     public int compare(Customer c1, Customer c2) {
-        return Integer.compare(c2.getLoyaltyPoints(), c1.getLoyaltyPoints()); // Descending order
-    }
-}
-
-class Customer {
-    private int id;
-    private String name;
-    private int loyaltyPoints;
-
-    public Customer(int id, String name) {
-        this.id = id;
-        this.name = name;
-        this.loyaltyPoints = 0;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getLoyaltyPoints() {
-        return loyaltyPoints;
-    }
-
-    public void addLoyaltyPoints(int points) {
-        this.loyaltyPoints += points;
-    }
-
-    public void updateDetails(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String toString() {
-        return "Customer ID: " + id + ", Name: " + name + ", Loyalty Points: " + loyaltyPoints;
-    }
-}
-
-class Product {
-    private int id;
-    private String name;
-    private double price;
-
-    public Product(int id, String name, double price) {
-        this.id = id;
-        this.name = name;
-        this.price = price;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public void updateDetails(String name, double price) {
-        this.name = name;
-        this.price = price;
-    }
-
-    @Override
-    public String toString() {
-        return "Product ID: " + id + ", Name: " + name + ", Price: " + price;
+        return c2.getPoints() - c1.getPoints();
     }
 }
 
 class Order {
-    private int orderId;
-    private int customerId;
-    private List<Product> products;
-    private Date deliveryDate;
+    int id; 
+    int quantity;
+    int customerId;
+    List<Product> products;
 
-    public Order(int orderId, int customerId, Date deliveryDate) {
-        this.orderId = orderId;
-        this.customerId = customerId;
-        this.products = new ArrayList<>();
-        this.deliveryDate = deliveryDate;
+    public Order(int id, int quantity, int customId) {
+        this.id = id;
+        this.quantity = quantity;
+        this.customerId = customId;
+        this.products = new ArrayList<Product>();
     }
 
-    public int getOrderId() {
-        return orderId;
+    int getId() {
+        return this.id;
     }
 
-    public int getCustomerId() {
-        return customerId;
+    int getQuantity() {
+        return this.quantity;
     }
 
-    public Date getDeliveryDate() {
-        return deliveryDate;
+    int getCustomer() {
+        return this.customerId;
     }
 
-    public void addProduct(Product product) {
-        products.add(product);
+    List<Product> getProducts() {
+        return this.products;
     }
 
-    public List<Product> getProducts() {
-        return products;
+    void addLoyaltyPoints(HashMap<Integer, Customer> customerMap) {
+        Customer customer = customerMap.get(this.customerId);
+        customer.addPoints(1);
+
     }
 
-    @Override
-    public String toString() {
-        return "Order ID: " + orderId + ", Customer ID: " + customerId + ", Delivery Date: " + deliveryDate;
+    void addProduct(Product product, HashMap<Integer, Customer> customerMap) {
+        this.products.add(product);
+        this.addLoyaltyPoints(customerMap);
     }
 }
 
-public class lab7 {
-    private static ArrayList<Customer> customers = new ArrayList<>();
-    private static ArrayList<Product> products = new ArrayList<>();
-    private static ArrayList<Order> orders = new ArrayList<>();
-    private static HashMap<Integer, Customer> customerMap = new HashMap<>();
-    private static HashMap<Integer, Product> productMap = new HashMap<>();
-    private static TreeSet<Customer> sortedCustomers = new TreeSet<>(new CustomerLoyaltyComparator());
-    private static TreeSet<Product> sortedProducts = new TreeSet<>(new ProductPriceComparator());
+class Product {
+    int id;
+    String name;
+    int price;  
 
+    public Product(int id, String name, int price) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+    }
+
+    int getId() {
+        return this.id;
+    }
+
+    String getName() {  
+        return this.name;   
+    }
+
+    int getPrice() {
+        return this.price;
+    }
+
+}
+
+class Customer {
+    int id;
+    String name;
+    int points;
+
+    public Customer(int id, String name) {
+        this.id = id;
+        this.name = name;
+        this.points = 0;
+    }
+
+    int getId() {
+        return this.id;
+    }
+
+    int getPoints() {
+        return this.points;
+    }
+
+    void addPoints(int points) {
+        this.points += points;
+    }
+
+    String getName() {
+        return  this.name;
+    }
+}
+
+class lab7 {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        int choice;
-        do {
-            System.out.println("Menu:");
-            System.out.println("1. Add Customer");
-            System.out.println("2. Add Product");
-            System.out.println("3. Place Order");
-            System.out.println("4. View Customers (Sorted by Loyalty Points)");
-            System.out.println("5. View Products (Sorted by Price)");
-            System.out.println("6. Exit");
-            System.out.print("Enter your choice: ");
-            choice = scanner.nextInt();
+        List<Customer> customers = new ArrayList<>();
+        List<Product> productList = new ArrayList<>();
+        List<Order> orderList = new ArrayList<>(); 
 
-            switch (choice) {
-                case 1:
-                    System.out.print("Enter Customer ID: ");
-                    int customerId = scanner.nextInt();
-                    scanner.nextLine(); // Consume newline
-                    System.out.print("Enter Customer Name: ");
-                    String customerName = scanner.nextLine();
-                    Customer customer = new Customer(customerId, customerName);
-                    customers.add(customer);
-                    customerMap.put(customerId, customer);
-                    sortedCustomers.add(customer);
-                    System.out.println("Customer added successfully.");
-                    break;
-                case 2:
-                    System.out.print("Enter Product ID: ");
-                    int productId = scanner.nextInt();
-                    scanner.nextLine(); // Consume newline
-                    System.out.print("Enter Product Name: ");
-                    String productName = scanner.nextLine();
-                    System.out.print("Enter Product Price: ");
-                    double price = scanner.nextDouble();
-                    Product product = new Product(productId, productName, price);
-                    products.add(product);
-                    productMap.put(productId, product);
-                    sortedProducts.add(product);
-                    System.out.println("Product added successfully.");
-                    break;
-                case 3:
-                    System.out.print("Enter Order ID: ");
-                    int orderId = scanner.nextInt();
-                    System.out.print("Enter Customer ID: ");
-                    customerId = scanner.nextInt();
-                    System.out.print("Enter Delivery Date (yyyy-mm-dd): ");
-                    scanner.nextLine(); // Consume newline
-                    String dateStr = scanner.nextLine();
-                    try {
-                        Date deliveryDate = new java.text.SimpleDateFormat("yyyy-MM-dd").parse(dateStr);
-                        Order order = new Order(orderId, customerId, deliveryDate);
-                        System.out.print("Enter Product IDs (comma-separated): ");
-                        String[] productIds = scanner.nextLine().split(",");
-                        for (String idStr : productIds) {
-                            int id = Integer.parseInt(idStr.trim());
-                            if (productMap.containsKey(id)) {
-                                order.addProduct(productMap.get(id));
-                            }
-                        }
-                        orders.add(order);
-                        System.out.println("Order placed successfully.");
-                    } catch (Exception e) {
-                        System.out.println("Invalid date format.");
-                    }
-                    break;
-                case 4:
-                    System.out.println("Customers sorted by loyalty points:");
-                    for (Customer c : sortedCustomers) {
-                        System.out.println(c);
-                    }
-                    break;
-                case 5:
-                    System.out.println("Products sorted by price:");
-                    for (Product p : sortedProducts) {
-                        System.out.println(p);
-                    }
-                    break;
-                case 6:
-                    System.out.println("Exiting...");
-                    break;
-                default:
-                    System.out.println("Invalid choice.");
-            }
-        } while (choice != 6);
+        HashMap<Integer, Customer> customerMap = new HashMap<>(); 
 
-        scanner.close();
+
+        Customer customer1 = new Customer(1, "Alice");
+        customers.add(customer1);
+        customerMap.put(1, customer1);
+
+        Customer customer2 = new Customer(2, "Bob");
+        customers.add(customer2);
+        customerMap.put(2, customer2);
+
+        System.out.println("Customers added successfully.");
+        System.out.println("Sorted Customers");
+
+        Product product1 = new Product(101, "Laptop", 1200);
+        productList.add(product1);
+
+        Product product2 = new Product(102, "Phone", 800);
+        productList.add(product2);
+
+        System.out.println("Products added successfully.");
+
+        Order order = new Order(201, 1,1);
+        order.addProduct(product1, customerMap);
+        order.addProduct(product2, customerMap);
+        orderList.add(order);
+
+        System.out.println("Order placed successfully.");
+
+        System.out.println("Customers sorted by loyalty points:");
+
+        Comparator<Customer> customerComparator = new sortCustomerPoints();
+        Collections.sort(customers, customerComparator);
+
+        for (Customer c : customers) {
+            System.out.println(c);
+        }
+
+        System.out.println("Products sorted by price:");
+        Comparator<Product> productComparator = new sortProductPrice();
+        Collections.sort(productList, productComparator);
+        for (Product p : productList) {
+            System.out.println(p);
+        }
     }
 }
